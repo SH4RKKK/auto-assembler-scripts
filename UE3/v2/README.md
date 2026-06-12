@@ -1,6 +1,6 @@
 # UE3 v2 (2025)
 
-Rewritten Auto Assembler scripts for a 64 bit game client running on a private server build. Supersedes the v1 scripts.
+Rewritten Auto Assembler scripts for a game client running on a private server build. Supersedes the v1 script.
 
 **Language:** Auto Assembler (Cheat Engine)
 
@@ -12,5 +12,5 @@ Edit `speedvalue` (default: 15) to set the desired speed.
 
 ## Notes
 
-- x64 only. No x86 variant.
+- x64 only.
 - `module_name_here` is a placeholder. Fill it in with the correct module name before use.
