@@ -17,7 +17,7 @@ AOB hooks the position write instruction and replaces it with a mode selector.
 | `gravity` | Freezes vertical position |
 | `altitude` | Constant upward push |
 | `clip` | Constant downward push |
-| `bossx` | Locks position to a saved coordinate set |
+| `bossx` | Sets position to a saved coordinate set so a mob can be summoned there to bypass dungeon |
 
 Set the desired symbol to `1` to activate.
 
@@ -27,13 +27,13 @@ Spawns a thread that traverses the GEngine pointer chain to locate the player po
 
 **Console troll variant** (`flyhack/flyhack_console_troll`)
 
-All in one script combining the fly hook with a console that prints a message on a loop. Uses a hardcoded pointer chain instead of the pointer finder.
+All in one script combining the fly hook with a console that prints a funny message on a loop. Uses a hardcoded pointer chain, which was the prior version, instead of the pointer finder.
 
 ## Console
 
 **`console/open_console`**
 
-Opens a Windows console window and redirects stdout to it. Frees its own memory on completion. Enable this before any script that prints output.
+Opens a Windows console window and redirects stdout to it.
 
 **`console/packet_reader`**
 
