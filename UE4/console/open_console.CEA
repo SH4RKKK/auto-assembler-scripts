@@ -1,0 +1,36 @@
+[ENABLE]
+alloc(newmem,2048,kernel32.dll)
+label(coconut)
+label(w)
+createthread(newmem)
+
+newmem:
+  push rbp
+  mov rbp,rsp
+  sub rsp,20
+  and spl,F0
+  call kernel32.AllocConsole
+  mov ecx,1
+  call ucrtbase._acrt_iob_func
+  mov r8,rax
+  lea rdx,[w]
+  lea rcx,[coconut]
+  call ucrtbase.freopen
+  mov rsp,rbp
+  pop rbp
+  mov rcx,newmem
+  xor rdx,rdx
+  mov r8d,8000
+  jmp kernel32.VirtualFree
+
+w:
+ db "w",0
+
+coconut:
+ dq "CONOUT$",0
+
+[DISABLE]
+
+
+
+

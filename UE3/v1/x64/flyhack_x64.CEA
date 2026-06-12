@@ -1,0 +1,68 @@
+[ENABLE]
+aobscanmodule(fly,module_name_here,00) //AOB pattern here
+alloc(flymem,$1000,70000)
+label(testcode)
+label(flycode)
+label(originalcode)
+label(clipcode)
+label(flyreturn)
+label(gravity)
+label(altitude)
+label(clip)
+registersymbol(gravity)
+registersymbol(altitude)
+registersymbol(clip)
+
+flymem:
+testcode:
+ cmp byte ptr[gravity],1
+ je flyreturn+10
+ cmp byte ptr[altitude],1
+ je flycode
+ cmp byte ptr[clip],1
+ je clipcode
+ jmp originalcode
+
+flycode:
+  push [rsp+68]
+  mov [rsp+68],(float)3
+  movss xmm0,[rsp+68]
+  pop [rsp+68]
+  jmp flyreturn
+
+clipcode:
+  push [rsp+68]
+  mov [rsp+68],(float)-3
+  movss xmm0,[rsp+68]
+  pop [rsp+68]
+  jmp flyreturn
+
+originalcode:
+  movss xmm0,[rsp+68]
+  jmp flyreturn
+
+gravity:
+  db 00
+
+altitude:
+  db 00
+
+clip:
+  db 00
+
+fly+34:
+  jmp flymem
+  nop
+flyreturn:
+registersymbol(fly)
+
+[DISABLE]
+
+fly+34:
+  db 00 00 00 00 00 00 //original bytes here
+
+unregistersymbol(gravity)
+unregistersymbol(altitude)
+unregistersymbol(clip)
+unregistersymbol(fly)
+dealloc(flymem)

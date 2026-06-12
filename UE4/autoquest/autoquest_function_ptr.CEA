@@ -1,0 +1,38 @@
+[ENABLE]
+
+aobscanmodule(daily_arg_scan,module_name_here,00) //AOB pattern here
+alloc(newmem,$1000,daily_arg_scan)
+
+label(code)
+label(return)
+label(daily_quest_ptr)
+
+newmem:
+
+code:
+  mov [rdi+00000138],rax
+  push rax
+  lea rax,[rdi+00000138]
+  mov [daily_quest_ptr],rax
+  pop rax
+  jmp return
+
+daily_quest_ptr:
+ dq 0
+
+daily_arg_scan:
+  jmp newmem
+  nop 2
+return:
+
+registersymbol(daily_arg_scan)
+registersymbol(daily_quest_ptr)
+
+[DISABLE]
+
+daily_arg_scan:
+  db 00 00 00 00 00 00 00 //original bytes here
+
+unregistersymbol(daily_quest_ptr)
+unregistersymbol(daily_arg_scan)
+dealloc(newmem)

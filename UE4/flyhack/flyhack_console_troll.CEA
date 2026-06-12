@@ -1,0 +1,125 @@
+[ENABLE]
+aobscanmodule(flyhack,module_name_here,00) //AOB pattern here
+alloc(flymem,$1000,flyhack)
+alloc(newmem,2048,kernel32.dll)
+label(testcode)
+label(orcode)
+label(return)
+label(graviytcode)
+label(altitudecode)
+label(xyz)
+label(altitude)
+label(shouldExit)
+label(coconut)
+label(w)
+label(FunnyMessage)
+registersymbol(shouldExit)
+registersymbol(xyz)
+registersymbol(flyhack)
+createthread(newmem)
+
+newmem:
+  push rbp
+  mov rbp,rsp
+  sub rsp,20
+  and spl,F0
+  call kernel32.AllocConsole
+  mov ecx,1
+  call ucrtbase._acrt_iob_func
+  mov r8,rax
+  lea rdx,[w]
+  lea rcx,[coconut]
+  call ucrtbase.freopen
+@@:
+  mov ecx,#500
+  call kernel32.Sleep
+  mov ecx,1
+  call ucrtbase._acrt_iob_func
+  xor r9,r9
+  lea r8,[FunnyMessage]
+  mov rdx,rax
+  mov rcx,24
+  call ucrtbase._stdio_common_vfprintf
+  cmp byte ptr[shouldExit],0
+  je @b
+// free memory, return
+  call kernel32.FreeConsole
+  mov ecx,#500
+  call kernel32.Sleep
+  mov rsp,rbp
+  pop rbp
+  mov rcx,newmem
+  xor rdx,rdx
+  mov r8d,8000
+  jmp kernel32.VirtualFree
+
+w:
+ db "w",0
+
+coconut:
+ dq "CONOUT$",0
+
+shouldExit:
+  dd 0
+
+FunnyMessage:
+ db 57,54,53,20,53,68,69,6d,6d,65,72,69,6e,67,20,53,63,61,6c,65,20,46,72,61,67,6d,65,6e,74,20,35,20,67,6f,6c,64,20,65,61,63,68,20,2f,20,53,6f,75,6c,73,74,6f,6e,65,73,0a,0
+
+flymem:
+testcode:
+  pushf
+  push rax
+  lea rax,[[[[["module_name_here"+game_address_here]+108]+50]+120]+1F0]
+  sub rax,1F0
+  mov [xyz+22],rax
+  cmp rax,rdi
+  jne orcode
+  cmp byte ptr[xyz+20],1
+  je graviytcode
+  cmp byte ptr[xyz+21],1
+  je altitudecode
+  movups [xyz],xmm7
+  jmp orcode
+graviytcode:
+  movups [xyz+10],xmm7
+  mov eax,dword ptr[xyz+8]
+  mov dword ptr[xyz+18],eax
+  movups xmm7,[xyz+10]
+  jmp orcode
+altitudecode:
+  movss xmm7,dword ptr[xyz+8]
+  addss xmm7,[altitude]
+  movss dword ptr[xyz+8],xmm7
+  movups xmm7,[xyz]
+  jmp orcode
+orcode:
+  pop rax
+  popf
+  movups [rdi+000001F0],xmm7
+  mov dl,01
+  movups [rdi+00000200],xmm6
+  jmp return
+
+altitude:
+ dd (float)5
+
+xyz:
+ db 0
+
+flyhack:
+  jmp testcode
+  nop 2
+return:
+
+[DISABLE]
+flyhack:
+  db 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 //original bytes here
+
+shouldExit:
+  dd 1
+
+unregistersymbol(shouldExit)
+unregistersymbol(flyhack)
+unregistersymbol(xyz)
+dealloc(flymem)
+

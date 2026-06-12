@@ -1,0 +1,60 @@
+[ENABLE]
+aobscanmodule(scan_ref,module_name_here,00) //AOB pattern here
+alloc(speed,$1000,kernel32.dll)
+label(end)
+label(speedvalue)
+label(addynotfound)
+registersymbol(end)
+registersymbol(speedvalue)
+createthread(speed)
+
+speed:
+  push rbp
+  mov rbp,rsp
+  sub rsp,20
+  and spl,F0
+@@:
+  mov ecx,#50
+  call kernel32.Sleep
+  mov rcx,[offset]
+  mov edx,#4
+  call kernel32.isBadReadPtr
+  cmp eax,0
+  jne bedtime
+  mov rbx,[offset]
+  mov eax,[speedvalue]
+  mov [rbx],eax
+  cmp byte ptr[end],0
+  je @b
+  mov eax,(float)1
+  mov [rbx],eax
+// free memory, return
+addynotfound:
+  mov rsp,rbp
+  pop rbp
+  mov rcx,speed
+  xor rdx,rdx
+  mov r8d,8000
+  jmp kernel32.VirtualFree
+bedtime:
+  mov ecx,#1000
+  call kernel32.Sleep
+  cmp byte ptr[end],0
+  jne addynotfound
+  jmp @b
+
+speedvalue:
+ dd (float)15
+
+end:
+  dd 0
+
+[DISABLE]
+
+end:
+  dd 1
+
+unregistersymbol(end)
+unregistersymbol(speedvalue)
+
+

@@ -1,0 +1,45 @@
+[ENABLE]
+
+aobscanmodule(speedhacks,module_name_here,00) //AOB pattern here
+alloc(hook_mem,$1000,speedhacks)
+
+label(offset)
+label(code)
+label(originalcode)
+label(return)
+
+hook_mem:
+
+code:
+  pushf
+  cmp esi,02
+  jne originalcode
+  cmp r14,10
+  jne originalcode
+  push rax
+  lea rax,[rcx+00000114]
+  mov [offset],rax
+  pop rax
+
+originalcode:
+  popf
+  ucomiss xmm0,[rcx+00000114]
+  jmp return
+
+offset:
+ dq 0
+
+speedhacks:
+  jmp hook_mem
+  nop 2
+return:
+registersymbol(speedhacks)
+registersymbol(offset)
+[DISABLE]
+
+speedhacks:
+  db 00 00 00 00 00 00 00 //original bytes here
+
+unregistersymbol(speedhacks)
+unregistersymbol(offset)
+dealloc(hook_mem)

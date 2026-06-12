@@ -1,0 +1,112 @@
+[ENABLE]
+aobscanmodule(flyhack,module_name_here,00) //AOB pattern here
+
+alloc(flymem,$1000)
+label(testcode)
+label(orcode)
+label(return)
+label(graviytcode)
+label(altitudecode)
+label(xyz)
+label(altitude)
+label(clippercode)
+label(clipper)
+label(thrall_is_cute)
+label(bossx)
+label(bossy)
+label(bossz)
+label(bosse)
+
+flymem:
+testcode:
+ pushf
+ push rax
+ mov eax,[tester]
+ cmp eax,0
+ jne orcode
+ mov rax,ptr1
+ mov rax,[rax]
+ sub rax,1F0
+ cmp rax,rdi
+ jne orcode
+ cmp byte ptr[xyz+20],1
+ je graviytcode
+ cmp byte ptr[xyz+21],1
+ je altitudecode
+ cmp byte ptr[xyz+22],1
+ je clippercode
+ cmp byte ptr[xyz+23],0
+ jne thrall_is_cute
+ movups [xyz],xmm7
+ jmp orcode
+graviytcode:
+ movups [xyz+10],xmm7
+ mov eax,dword ptr[xyz+8]
+ mov dword ptr[xyz+18],eax
+ movups xmm7,[xyz+10]
+ jmp orcode
+altitudecode:
+ movss xmm7,dword ptr[xyz+8]
+ addss xmm7,[altitude]
+ movss dword ptr[xyz+8],xmm7
+ movups xmm7,[xyz]
+ jmp orcode
+clippercode:
+ movss xmm7,dword ptr[xyz+8]
+ addss xmm7,[clipper]
+ movss dword ptr[xyz+8],xmm7
+ movups xmm7,[xyz]
+ jmp orcode
+thrall_is_cute:
+ cmp byte ptr[xyz+23],1
+ jne orcode
+ movups xmm7,[bossx]
+ jmp orcode
+
+orcode:
+ pop rax
+ popf
+ movups [rdi+000001F0],xmm7
+ mov rcx,rdi
+ movups [rdi+00000200],xmm6
+ jmp return
+
+altitude:
+ dd (float)3
+
+clipper:
+ dd (float)-3
+
+bossx:
+ dd (float)0
+
+bossy:
+ dd (float)0
+
+bossz:
+ dd (float)0
+
+bosse:
+ dd 0
+
+xyz:
+ db 0
+
+flyhack:
+  jmp flymem
+  nop 3
+return:
+
+registersymbol(bossx)
+registersymbol(xyz)
+registersymbol(flyhack)
+
+[DISABLE]
+flyhack:
+  db 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 //original bytes here
+
+unregistersymbol(bossx)
+unregistersymbol(flyhack)
+unregistersymbol(xyz)
+dealloc(flymem)
+

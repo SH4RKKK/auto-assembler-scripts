@@ -1,0 +1,33 @@
+[ENABLE]
+
+aobscanmodule(INJECT,module_name_here,00) //AOB pattern here
+alloc(newmem,$1000,INJECT)
+label(code)
+label(return)
+label(speedvalue)
+
+newmem:
+code:
+  movss xmm0,[speedvalue]
+  movss [rcx+00000114],xmm0
+  jmp return
+
+speedvalue:
+ dd (float)15
+
+INJECT:
+  jmp newmem
+  nop 3
+return:
+
+registersymbol(INJECT)
+registersymbol(speedvalue)
+
+[DISABLE]
+
+INJECT:
+  db 00 00 00 00 00 00 00 00 //original bytes here
+
+unregistersymbol(INJECT)
+unregistersymbol(speedvalue)
+dealloc(newmem)

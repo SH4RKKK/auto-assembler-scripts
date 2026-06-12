@@ -1,0 +1,75 @@
+[ENABLE]
+alloc(thread_mem,2048,kernel32.dll)
+label(shouldExit)
+label(no_argument)
+label(zone_1)
+label(zone_1_fill)
+label(zone_1_2)
+label(caller)
+label(looper)
+registersymbol(shouldExit)
+registersymbol(thread_mem)
+createthread(thread_mem)
+// only implemented for one specific quest zone. other zones are stubs.
+
+thread_mem:
+  push rbp
+  mov rbp,rsp
+  sub rsp,20
+  and spl,F0
+cave:
+  mov ecx,#250
+  call kernel32.Sleep
+  mov rcx,daily_quest_ptr
+  mov rcx,[rcx]
+  cmp rcx,0
+  je no_argument
+  mov rbx,module_name_here+geozone_address_here
+  mov ebx,dword ptr[rbx]
+  cmp ebx,(int)6729
+  je zone_1
+  jmp no_argument
+zone_1:
+  cmp byte ptr[looper],0
+  jne zone_1_fill
+  mov byte ptr[looper],2
+zone_1_fill:
+  cmp byte ptr[looper],2
+  je zone_1_2
+  mov word ptr[rcx+28],(int)25265
+  mov byte ptr[rcx+49],0
+  jmp caller
+zone_1_2:
+  mov word ptr[rcx+28],(int)2090
+  mov byte ptr[rcx+49],2
+  jmp caller
+caller:
+  mov rdx,02
+  mov byte ptr[rcx+48],1
+  call module_name_here+quest_caller_address_here
+  mov dl,byte ptr[looper]
+  dec dl
+  mov byte ptr[looper],dl
+no_argument:
+  cmp byte ptr[shouldExit],0
+  je cave
+// free memory, return
+  mov rsp,rbp
+  pop rbp
+  mov rcx,thread_mem
+  xor rdx,rdx
+  mov r8d,8000
+  jmp kernel32.VirtualFree
+
+shouldExit:
+  db 0
+looper:
+  db 0
+
+[DISABLE]
+
+shouldExit:
+  db 1
+
+unregistersymbol(thread_mem)
+unregistersymbol(shouldExit)

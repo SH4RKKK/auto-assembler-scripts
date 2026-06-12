@@ -1,0 +1,116 @@
+[ENABLE]
+alloc(speed,$1000,kernel32.dll)
+label(end)
+label(Base)
+label(free)
+label(ptr1)
+label(tester)
+registersymbol(tester)
+registersymbol(end)
+registersymbol(ptr1)
+createthread(speed)
+
+speed:
+  push rbp
+  mov rbp,rsp
+  sub rsp,20
+  and spl,F0
+Base:
+  mov ecx,#1000
+  call kernel32.Sleep
+  mov rbx,GEngine
+  mov rbx,[rbx]
+  cmp rbx,#0
+  je Base
+  mov rcx,rbx
+  mov edx,#8
+  call kernel32.isBadReadPtr
+  cmp eax,#0
+  jne Base
+  mov rbx,[rbx+788]
+  mov rcx,rbx
+  mov edx,#8
+  call kernel32.isBadReadPtr
+  cmp eax,#0
+  jne ptr_invalid
+  mov rbx,[rbx+80]
+  mov rcx,rbx
+  mov edx,#8
+  call kernel32.isBadReadPtr
+  cmp eax,#0
+  jne ptr_invalid
+  mov rbx,[rbx+38]
+  mov rcx,rbx
+  mov edx,#8
+  call kernel32.isBadReadPtr
+  cmp eax,#0
+  jne ptr_invalid
+  mov rbx,[rbx+0]
+  mov rcx,rbx
+  mov edx,#8
+  call kernel32.isBadReadPtr
+  cmp eax,#0
+  jne ptr_invalid
+  mov rbx,[rbx+30]
+  mov rcx,rbx
+  mov edx,#8
+  call kernel32.isBadReadPtr
+  cmp eax,#0
+  jne ptr_invalid
+  mov rbx,[rbx+2C0]
+  mov rcx,rbx
+  mov edx,#8
+  call kernel32.isBadReadPtr
+  cmp eax,#0
+  jne ptr_invalid
+  mov rbx,[rbx+130]
+  mov rcx,rbx
+  mov edx,#8
+  call kernel32.isBadReadPtr
+  cmp eax,#0
+  jne ptr_invalid
+  lea rbx,[rbx+1F0]
+  mov rcx,rbx
+  mov edx,#8
+  call kernel32.isBadReadPtr
+  cmp eax,#0
+  jne ptr_invalid
+  mov [ptr1],rbx
+  mov dword ptr[tester],0
+  cmp byte ptr[end],0
+  je Base
+// free memory, return
+free:
+  mov rsp,rbp
+  pop rbp
+  mov rcx,speed
+  xor rdx,rdx
+  mov r8d,8000
+  jmp kernel32.VirtualFree
+ptr_invalid:
+  mov dword ptr[tester],1
+  mov rbx,"module_name_here"
+  mov qword ptr[ptr1],rbx
+  cmp byte ptr[end],#1
+  je free
+  jmp Base
+
+
+ptr1:
+  dq 0
+
+end:
+  dd 0
+
+tester:
+  dd 1
+
+[DISABLE]
+
+end:
+  dd 1
+
+unregistersymbol(tester)
+unregistersymbol(ptr1)
+unregistersymbol(end)
+

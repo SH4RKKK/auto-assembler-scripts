@@ -1,0 +1,93 @@
+[ENABLE]
+
+aobscanmodule(packets,module_name_here,00) //AOB pattern here
+alloc(packetmem,$1000,packets)
+
+label(code)
+label(orcode)
+label(return)
+label(Funnymessage)
+label(int1)
+label(inttostring)
+label(nullstr)
+label(pointerfunny)
+
+packetmem:
+
+code:
+  pushf
+  push rcx
+  push rdx
+  push rax
+  push r8
+  push r9
+  push rbx
+  mov [int1],rdi
+  mov rcx,Funnymessage+50
+  xor rax,rax
+  mov eax,dword ptr[int1]
+inttostring:
+  xor rdx,rdx
+  xor rbx,rbx
+  mov bl,#10
+  div rbx
+  push rax
+  add dl,#48
+  mov byte ptr[rcx],dl
+  dec rcx
+  pop rax
+  cmp rax,0
+  jne inttostring
+  inc rcx
+  mov [pointerfunny],rcx
+  mov byte ptr[Funnymessage+51],0A
+  mov byte ptr[Funnymessage+52],0
+  xor rcx,rcx
+  mov ecx,1
+  call ucrtbase._acrt_iob_func
+  xor r9,r9
+  mov r8,[pointerfunny]
+  mov rdx,rax
+  mov rcx,24
+  call ucrtbase._stdio_common_vfprintf
+  lea rdx,[Funnymessage+52]
+  mov rcx,[pointerfunny]
+nullstr:
+  mov byte ptr[rcx],0
+  inc rcx
+  cmp rcx,rdx
+  jne nullstr
+orcode:
+  pop rbx
+  pop r8
+  pop r9
+  pop rcx
+  pop rdx
+  pop rax
+  popf
+  call qword ptr [rax+08]
+  cmp eax,r12d
+  jmp return
+
+packets:
+  jmp packetmem
+  nop
+return:
+registersymbol(packets)
+
+int1:
+ dq 0
+
+pointerfunny:
+ dq 0
+
+Funnymessage:
+ db 0
+
+[DISABLE]
+
+packets:
+  db 00 00 00 00 00 00 //original bytes here
+
+unregistersymbol(packets)
+dealloc(packetmem)
