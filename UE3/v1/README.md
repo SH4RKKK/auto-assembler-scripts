@@ -1,6 +1,6 @@
 # UE3 v1 (2019-2021)
 
-Auto Assembler scripts for a 32 bit and 64 bit game client. First generation implementations, superseded by the v2 rewrites.
+Auto Assembler scripts for a 32 bit and 64 bit game client.
 
 **Language:** Auto Assembler (Cheat Engine)
 
